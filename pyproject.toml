@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "botoful"
+version = "0.1.0"
+description = "A beautiful boto wrapper"
+authors = ["Imtiaz Mangerah <Imtiaz_Mangerah@a2d24.com>"]
+license = "MIT"
+homepage = "https://github.com/a2d24/botoful"
+repository = "https://github.com/a2d24/botoful"
+documentation = "https://github.com/a2d24/botoful"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.2"
+pytest-cov = "^2.11.1"
+Pygments = "^2.8.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
