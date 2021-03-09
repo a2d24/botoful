@@ -187,7 +187,7 @@ class Query:
         import json
         print(json.dumps(self.build(params=params, starting_token=starting_token), indent=2))
 
-    def execute(self, boto_client, starting_token=None, model=None, params=None) -> QueryResult:
+    def execute(self, client, starting_token=None, model=None, params=None) -> QueryResult:
 
         if params is None:
             params = {}
@@ -195,7 +195,7 @@ class Query:
         if not self.table:
             raise RuntimeError("Queries cannot be executed without a table name specified")
 
-        paginator = boto_client.get_paginator('query')
+        paginator = client.get_paginator('query')
         query = self.build(params=params, starting_token=starting_token)
 
         response = paginator.paginate(**query).build_full_result()
