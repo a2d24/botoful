@@ -41,42 +41,45 @@ class Condition:
         self.value = value
 
     def as_key_condition_expression(self):
+
         if self.operator == '=':
-            return f"{self.key} = :{self.key}"
+            return f"{self.key} = :{self.raw_key}"
         elif self.operator == 'begins_with':
-            return f"begins_with ({self.key}, :{self.key})"
+            return f"begins_with ({self.key}, :{self.raw_key})"
         elif self.operator == 'gte':
-            return f"{self.key} >= :{self.key}"
+            return f"{self.key} >= :{self.raw_key}"
         elif self.operator == 'lte':
-            return f"{self.key} <= :{self.key}"
+            return f"{self.key} <= :{self.raw_key}"
         elif self.operator == 'gt':
-            return f"{self.key} > :{self.key}"
+            return f"{self.key} > :{self.raw_key}"
         elif self.operator == 'lt':
-            return f"{self.key} < :{self.key}"
+            return f"{self.key} < :{self.raw_key}"
         elif self.operator == 'between':
-            return f"{self.key} BETWEEN :{self.key}_lower AND :{self.key}_upper"
+            return f"{self.key} BETWEEN :{self.raw_key}_lower AND :{self.raw_key}_upper"
 
         raise NotImplementedError(f"Operator {self.operator} is currently not supported")
 
     def as_expression_attribute_values(self, params):
 
         if self.operator == 'between':
-
-
             lower = self.value[0].format(**params) if isinstance(self.value[0], str) else self.value[0]
             upper = self.value[1].format(**params) if isinstance(self.value[0], str) else self.value[1]
 
             return {
-                f":{self.key}_lower": serialize(lower),
-                f":{self.key}_upper": serialize(upper),
+                f":{self.raw_key}_lower": serialize(lower),
+                f":{self.raw_key}_upper": serialize(upper),
             }
 
-        _key = f":{self.key}"
+        _key = f":{self.raw_key}"
         if isinstance(self.value, str):
             return {_key: serialize(self.value.format(**params))}
 
         if isinstance(self.value, numbers.Number):
             return {_key: serialize(self.value)}
+
+    @property
+    def raw_key(self):
+        return f"{self.key[1:]}" if self.key.startswith('#') else self.key
 
 
 class Query:
@@ -182,12 +185,15 @@ class Query:
             params = {}
 
         import json
-        print(json.dumps(self.build(params=params, starting_token=starting_token),indent=2))
+        print(json.dumps(self.build(params=params, starting_token=starting_token), indent=2))
 
     def execute(self, boto_client, starting_token=None, model=None, params=None) -> QueryResult:
 
         if params is None:
             params = {}
+
+        if not self.table:
+            raise RuntimeError("Queries cannot be executed without a table name specified")
 
         paginator = boto_client.get_paginator('query')
         query = self.build(params=params, starting_token=starting_token)
