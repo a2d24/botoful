@@ -84,7 +84,7 @@ class Condition:
 
 class Query:
 
-    def __init__(self, table):
+    def __init__(self, table=None):
 
         self.table = table
 
