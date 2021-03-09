@@ -81,7 +81,7 @@ class Condition:
 
 class Query:
 
-    def __init__(self, table, client=None):
+    def __init__(self, table):
 
         self.table = table
 
@@ -91,6 +91,7 @@ class Query:
 
         self._named_variables: Set[str] = set()
         self._attributes_to_fetch: Set[str] = set()
+        self._page_size = None
 
     @fluent
     def page_size(self, page_size) -> Query:
