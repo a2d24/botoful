@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "botoful"
-version = "0.1.0"
+version = "0.1.1"
 description = "A beautiful boto wrapper"
 authors = ["Imtiaz Mangerah <Imtiaz_Mangerah@a2d24.com>"]
 license = "MIT"
@@ -10,6 +10,7 @@ documentation = "https://github.com/a2d24/botoful"
 
 [tool.poetry.dependencies]
 python = "^3.6"
+boto3 = {version = "^1.17.23", optional = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
@@ -19,3 +20,6 @@ Pygments = "^2.8.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.extras]
+boto = ["boto3"]
