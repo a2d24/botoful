@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "botoful"
-version = "0.2.2"
+version = "0.2.3"
 description = "A beautiful boto wrapper"
 authors = ["Imtiaz Mangerah <Imtiaz_Mangerah@a2d24.com>"]
 license = "MIT"
-homepage = "https://github.com/a2d24/botoful"
+homepage = "https://www.botoful.com"
 repository = "https://github.com/a2d24/botoful"
-documentation = "https://github.com/a2d24/botoful"
+documentation = "https://www.botoful.com"
 
 [tool.poetry.dependencies]
 python = "^3.6"
