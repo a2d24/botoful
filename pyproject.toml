@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "botoful"
-version = "0.2.3"
+version = "0.3.0"
 description = "A beautiful boto wrapper"
 authors = ["Imtiaz Mangerah <Imtiaz_Mangerah@a2d24.com>"]
 license = "MIT"

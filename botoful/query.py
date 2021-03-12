@@ -97,6 +97,7 @@ class Query:
         self._attributes_to_fetch: Set[str] = set()
         self._filter: Union[Filter, None] = None
         self._page_size = None
+        self._consistent_read = False
 
     @fluent
     def page_size(self, page_size) -> Query:
@@ -133,6 +134,11 @@ class Query:
     @fluent
     def filter(self, condition: ConditionBase):
         self._filter = condition
+        return self
+
+    @fluent
+    def consistent(self, consistent_read: bool=True):
+        self._consistent_read = consistent_read
         return self
 
     def _name_variable(self, variable):
@@ -197,6 +203,8 @@ class Query:
             expression_attribute_values.update(filter_to_apply.value_placeholders)
             result['FilterExpression'] = filter_to_apply.expression
 
+        if self._consistent_read:
+            result['ConsistentRead'] = self._consistent_read
 
         if expression_attribute_names:
             result['ExpressionAttributeNames'] = expression_attribute_names
