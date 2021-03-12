@@ -3,8 +3,9 @@ from __future__ import annotations
 import copy
 import numbers
 from functools import wraps, reduce
-from typing import List, Set
+from typing import List, Set, Union
 
+from .filters import build_filter, Filter, ConditionBase
 from .reserved import RESERVED_KEYWORDS
 from .serializers import deserialize, serialize
 
@@ -94,6 +95,7 @@ class Query:
 
         self._named_variables: Set[str] = set()
         self._attributes_to_fetch: Set[str] = set()
+        self._filter: Union[Filter, None] = None
         self._page_size = None
 
     @fluent
@@ -128,6 +130,11 @@ class Query:
         self._attributes_to_fetch.update(keys)
         return self
 
+    @fluent
+    def filter(self, condition: ConditionBase):
+        self._filter = condition
+        return self
+
     def _name_variable(self, variable):
         if variable.upper() not in RESERVED_KEYWORDS:
             return variable
@@ -138,6 +145,9 @@ class Query:
 
     def build(self, params, starting_token=None):
         result = {}
+        expression_attribute_names = {}
+        expression_attribute_values = {}
+
         if self.table:
             result['TableName'] = self.table
 
@@ -156,27 +166,43 @@ class Query:
                 (c.as_key_condition_expression() for c in self._key_conditions)
             )
 
-            expression_attribute_values = [c.as_expression_attribute_values(params=params) for c in
-                                           self._key_conditions]
-            result['ExpressionAttributeValues'] = reduce(lambda a, b: {**a, **b}, expression_attribute_values)
+            expression_attribute_values.update(
+                reduce(lambda a, b: {**a, **b},
+                       [
+                           c.as_expression_attribute_values(params=params) for c in self._key_conditions
+                       ]))
+
         else:
             raise RuntimeError("No key conditions specified for query. A query requires at least one key condition")
 
         if self._named_variables:
-            result['ExpressionAttributeNames'] = {f"#{var}": var for var in self._named_variables}
+            expression_attribute_names.update({f"#{var}": var for var in self._named_variables})
 
         # Build ProjectionExpression
 
         if self._attributes_to_fetch:
 
-            result['ProjectionExpression'] = ','.join(
+            result['ProjectionExpression'] = ', '.join(
                 [f"#{attr}" if attr.upper() in RESERVED_KEYWORDS else attr for attr in self._attributes_to_fetch]
             )
 
             reserved_keywords_attributes = list(
                 filter(lambda item: item.upper() in RESERVED_KEYWORDS, self._attributes_to_fetch))
             if reserved_keywords_attributes:
-                result['ExpressionAttributeNames'] = {f"#{attr}": attr for attr in reserved_keywords_attributes}
+                expression_attribute_names.update({f"#{attr}": attr for attr in reserved_keywords_attributes})
+
+        if self._filter:
+            filter_to_apply = build_filter(self._filter)
+            expression_attribute_names.update(filter_to_apply.name_placeholders)
+            expression_attribute_values.update(filter_to_apply.value_placeholders)
+            result['FilterExpression'] = filter_to_apply.expression
+
+
+        if expression_attribute_names:
+            result['ExpressionAttributeNames'] = expression_attribute_names
+
+        if expression_attribute_values:
+            result['ExpressionAttributeValues'] = expression_attribute_values
 
         return result
 
