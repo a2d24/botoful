@@ -98,6 +98,7 @@ class Query:
         self._filter: Union[Filter, None] = None
         self._page_size = None
         self._consistent_read = False
+        self._scan_index_forward = True
 
     @fluent
     def page_size(self, page_size) -> Query:
@@ -139,6 +140,16 @@ class Query:
     @fluent
     def consistent(self, consistent_read: bool=True):
         self._consistent_read = consistent_read
+        return self
+
+    @fluent
+    def forwards(self):
+        self._scan_index_forward = True
+        return self
+
+    @fluent
+    def backwards(self):
+        self._scan_index_forward = False
         return self
 
     def _name_variable(self, variable):
@@ -205,6 +216,10 @@ class Query:
 
         if self._consistent_read:
             result['ConsistentRead'] = self._consistent_read
+
+        # Default for ScanIndexForward is True, so set only if this value is False
+        if not self._scan_index_forward:
+            result['ScanIndexForward'] = self._scan_index_forward
 
         if expression_attribute_names:
             result['ExpressionAttributeNames'] = expression_attribute_names
