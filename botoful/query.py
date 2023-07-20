@@ -14,7 +14,7 @@ def fluent(func):
     # Decorator that assists in a fluent api.
     # It clones the current 'self', calls the wrapped method on the clone and returns the clone
     @wraps(func)
-    def fluent_wrapper(self, *args, **kwargs):
+    def fluent_wrapper(self, *args, **kwargs) -> Query:
         new_self = copy.deepcopy(self)
         return func(new_self, *args, **kwargs)
 
@@ -105,6 +105,7 @@ class Query:
         self._page_size = page_size
         return self
 
+    @fluent
     def limit(self, limit) -> Query:
         return self.page_size(page_size=limit)
 
@@ -128,27 +129,27 @@ class Query:
         return self
 
     @fluent
-    def attributes(self, keys: List[str]):
+    def attributes(self, keys: List[str]) -> Query:
         self._attributes_to_fetch.update(keys)
         return self
 
     @fluent
-    def filter(self, condition: ConditionBase):
+    def filter(self, condition: ConditionBase) -> Query:
         self._filter = condition
         return self
 
     @fluent
-    def consistent(self, consistent_read: bool=True):
+    def consistent(self, consistent_read: bool = True) -> Query:
         self._consistent_read = consistent_read
         return self
 
     @fluent
-    def forwards(self):
+    def forwards(self) -> Query:
         self._scan_index_forward = True
         return self
 
     @fluent
-    def backwards(self):
+    def backwards(self) -> Query:
         self._scan_index_forward = False
         return self
 
