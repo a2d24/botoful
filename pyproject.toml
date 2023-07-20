@@ -9,8 +9,9 @@ repository = "https://github.com/a2d24/botoful"
 documentation = "https://www.botoful.com"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.8"
 boto3 = {version = "^1.17.23", optional = true}
+moto = {extras = ["dynamodb"], version = "^4.1.13"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
