@@ -29,3 +29,11 @@ def test_fetch_item(client):
 
     item = table.item(PK='TableTestItem1', SK='TestItem1SK').attributes(['boolean', 'string']).get()
     assert item == {'boolean': True, 'string': 'hello'}
+
+def test_query_using_table_api(client):
+    table = botoful.Table(name=TABLE_NAME, client=client)
+
+    result = table.query().key(PK='TableTestItem1').execute(client=client)
+
+    assert result.count == 1
+    assert result.items == [TEST_ITEM_1]

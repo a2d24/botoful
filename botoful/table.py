@@ -6,7 +6,7 @@ from typing import List, Set, Tuple, Optional, Dict
 
 from botoful.reserved import RESERVED_KEYWORDS
 from botoful.serializers import serialize, deserialize
-
+from botoful.query import Query
 
 def fluent(func):
     # Decorator that assists in a fluent api.
@@ -37,6 +37,8 @@ class Table:
     def item(self, **kwargs) -> Item:
         return Item(table=self).key(**kwargs)
 
+    def query(self) -> Query:
+        return Query(table=self.name)
 
 class Item:
 
