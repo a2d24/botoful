@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "botoful"
-version = "0.4.0"
+version = "0.4.1"
 description = "A beautiful boto wrapper"
 authors = ["Imtiaz Mangerah <Imtiaz_Mangerah@a2d24.com>"]
 license = "MIT"
@@ -11,13 +11,13 @@ documentation = "https://www.botoful.com"
 [tool.poetry.dependencies]
 python = "^3.8"
 boto3 = {version = "^1.17.23", optional = true}
-moto = {extras = ["dynamodb"], version = "^4.1.13"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
 Pygments = "^2.8.1"
 boto3 = "^1.17.23"
+moto = {extras = ["dynamodb"], version = "^4.1.13"}
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
